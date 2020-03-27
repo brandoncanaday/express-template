@@ -1,0 +1,74 @@
+image: node:latest
+
+stages:
+    - build
+    - test
+    - deploy
+
+.skip_ci: &skip_ci
+    except:
+        variables:
+            - $CI_COMMIT_MESSAGE =~ /\[skip ci\]/
+
+build:
+    stage: build
+    only:
+        - dev
+        - master
+    <<: *skip_ci
+    cache:
+        paths:
+            - node_modules/
+    script:
+        - npm install --quiet
+        - npm run build
+    artifacts:
+        paths:
+            - dist/
+
+test:
+    stage: test
+    only:
+        - merge_requests
+    <<: *skip_ci
+    cache:
+        policy: pull
+        paths:
+            - node_modules/
+    script:
+        - npm run lint
+        - npm run test
+
+deploy_dev:
+    stage: deploy
+    only:
+        - dev
+    <<: *skip_ci
+    environment:
+        name: development
+        url: $FIREBASE_DEV_URL
+    dependencies:
+        - build
+    cache:
+        policy: pull
+        paths:
+            - node_modules/
+    script:
+        - npm run deploy
+
+deploy_prod:
+    stage: deploy
+    only:
+        - master
+    <<: *skip_ci
+    environment:
+        name: production
+        url: $FIREBASE_PROD_URL
+    dependencies:
+        - build
+    cache:
+        policy: pull
+        paths:
+            - node_modules/
+    script:
+        - npm run release

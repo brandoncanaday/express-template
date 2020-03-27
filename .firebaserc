@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "development": "<firebase-project-name>",
+    "production": "<firebase-project-name>"
+  }
+}

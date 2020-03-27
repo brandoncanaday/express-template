@@ -1,0 +1,16 @@
+{
+    "hosting": {
+        "public": "dist",
+        "ignore": ["**"],
+        "rewrites": [
+            {
+                "source": "/api/**",
+                "function": "main"
+            }
+        ]
+    },
+    "functions": {
+        "source": "dist",
+        "ignore": ["**/node_modules/**"]
+    }
+}
